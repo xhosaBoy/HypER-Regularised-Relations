@@ -89,33 +89,47 @@ class HypER(torch.nn.Module):
     def forward(self, e1_idx, r_idx):
 
         e1 = self.E(e1_idx).view(-1, 1, 1, self.E.weight.size(1))
+
+        # Convolutional input regularisation
         x = self.bn0(e1)
         x = self.inp_drop(x)
 
         r = self.R(r_idx)
+
+        # Hyper network regularisation
+        r = self.bn2(r)
+        r = self.inp_drop(r)
+
         k = self.fc1(r)
-        k = k.view(-1, self.in_channels, self.out_channels, self.filt_h, self.filt_w)
-        k = k.view(e1.size(0) * self.in_channels * self.out_channels, 1, self.filt_h, self.filt_w)
-        k = self.inp_drop(k)
+
+        # Convolutional filter regularisation
+        # k = self.bn0(k)
+        # k = self.inp_drop(k)
 
         x = x.permute(1, 0, 2, 3)
 
+        k = k.view(-1, self.in_channels, self.out_channels, self.filt_h, self.filt_w)
+        k = k.view(e1.size(0) * self.in_channels * self.out_channels, 1, self.filt_h, self.filt_w)
+
         x = F.conv2d(x, k, groups=e1.size(0))
+
         x = x.view(e1.size(0), 1, self.out_channels, 1 - self.filt_h + 1, e1.size(3) - self.filt_w + 1)
         x = x.permute(0, 3, 4, 1, 2)
         x = torch.sum(x, dim=3)
-
         x = x.permute(0, 3, 1, 2).contiguous()
 
+        # Feature map regularisation
         x = self.bn1(x)
-        x = self.feature_map_drop(x) 
+        x = self.feature_map_drop(x)
+
         x = x.view(e1.size(0), -1)
 
         x = self.fc(x)
-        x = self.hidden_drop(x)
-        x = self.bn2(x)
-
         x = F.relu(x)
+
+        # Hidden layer regularisation
+        x = self.bn2(x)
+        x = self.hidden_drop(x)
 
         x = torch.mm(x, self.E.weight.transpose(1,0))
         x += self.b.expand_as(x)
