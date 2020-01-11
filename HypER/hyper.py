@@ -23,7 +23,7 @@ stream_handler.setLevel(logging.INFO)
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
-file_handler = logging.FileHandler('hntn_train_validate_and_test_wn18_200d_hyper_plus.log')
+file_handler = logging.FileHandler('hntn_train_validate_and_test_fb15k_200d_hypothesis.log')
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
@@ -261,18 +261,20 @@ class Experiment:
 
             logger.info(f'Mean training cost: {np.mean(costs)}')
 
-            model.eval()
-            with torch.no_grad():
-                train_data = np.array(d.train_data)
-                train_data = train_data[np.random.choice(train_data.shape[0], 10000, replace=False), :]
-                self.evaluate(model, train_data, epoch, 'training')
-                logger.info(f'Starting Validation ...')
-                self.evaluate(model, d.valid_data, epoch, 'validation')
-                logger.info(f'Starting Test ...')
-                self.evaluate(model, d.test_data, epoch, 'testing')
+            if epoch % 2 == 0:
+                model.eval()
+                with torch.no_grad():
+                    train_data = np.array(d.train_data)
+                    train_data = train_data[np.random.choice(train_data.shape[0], 10000, replace=False), :]
+                    self.evaluate(model, train_data, epoch, 'training')
+                    logger.info(f'Starting Validation ...')
+                    self.evaluate(model, d.valid_data, epoch, 'validation')
+                    logger.info(f'Starting Test ...')
+                    self.evaluate(model, d.test_data, epoch, 'testing')
 
 
 if __name__ == '__main__':
+    logger.info('START!')
     parser = argparse.ArgumentParser()
     parser.add_argument('--algorithm',
                         type=str,
@@ -281,7 +283,7 @@ if __name__ == '__main__':
                         help='Which algorithm to use: HypER, ConvE, DistMult, or ComplEx')
     parser.add_argument('--dataset',
                         type=str,
-                        default="WN18",
+                        default="FB15k",
                         nargs="?",
                         help='Which dataset to use: FB15k, FB15k-237, WN18 or WN18RR')
 
@@ -317,3 +319,4 @@ if __name__ == '__main__':
                             filt_w=9,
                             label_smoothing=0.1)
     experiment.train_and_eval()
+    logger.info('DONE!')
