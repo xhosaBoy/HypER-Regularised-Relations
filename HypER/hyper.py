@@ -274,6 +274,7 @@ class Experiment:
 
 
 if __name__ == '__main__':
+    logger.info('START!')
     parser = argparse.ArgumentParser()
     parser.add_argument('--algorithm',
                         type=str,
@@ -318,3 +319,4 @@ if __name__ == '__main__':
                             filt_w=9,
                             label_smoothing=0.1)
     experiment.train_and_eval()
+    logger.info('DONE!')
