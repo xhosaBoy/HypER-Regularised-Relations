@@ -65,20 +65,20 @@ class HypER(torch.nn.Module):
         self.filt_h = kwargs["filt_h"]
         self.filt_w = kwargs["filt_w"]
 
+        fc_length = (1 - self.filt_h + 1) * (d1 - self.filt_w + 1) * self.out_channels
+        self.fc = torch.nn.Linear(fc_length, d1)
+        fc1_length = self.in_channels * self.out_channels * self.filt_h * self.filt_w
+        self.fc1 = torch.nn.Linear(d2, fc1_length)
+
         self.inp_drop = torch.nn.Dropout(kwargs["input_dropout"])
         self.hidden_drop = torch.nn.Dropout(kwargs["hidden_dropout"])
         self.feature_map_drop = torch.nn.Dropout2d(kwargs["feature_map_dropout"])
 
         self.bn0 = torch.nn.BatchNorm2d(self.in_channels)
         self.bn1 = torch.nn.BatchNorm2d(self.out_channels)
-        self.bn2 = torch.nn.BatchNorm1d(d1)
+        self.bn2 = torch.nn.BatchNorm1d(d2)
 
         self.register_parameter('b', Parameter(torch.zeros(len(d.entities))))
-
-        fc_length = (1 - self.filt_h + 1) * (d1 - self.filt_w + 1) * self.out_channels
-        self.fc = torch.nn.Linear(fc_length, d1)
-        fc1_length = self.in_channels * self.out_channels * self.filt_h * self.filt_w
-        self.fc1 = torch.nn.Linear(d2, fc1_length)
 
         self.loss = torch.nn.BCELoss()
 
@@ -96,15 +96,11 @@ class HypER(torch.nn.Module):
 
         r = self.R(r_idx)
 
-        # Hyper network regularisation
+        # Convolutional filter regularisation
         r = self.bn2(r)
         r = self.inp_drop(r)
 
         k = self.fc1(r)
-
-        # Convolutional filter regularisation
-        # k = self.bn0(k)
-        # k = self.inp_drop(k)
 
         x = x.permute(1, 0, 2, 3)
 
@@ -126,10 +122,6 @@ class HypER(torch.nn.Module):
 
         x = self.fc(x)
         x = F.relu(x)
-
-        # Hidden layer regularisation
-        x = self.bn2(x)
-        x = self.hidden_drop(x)
 
         x = torch.mm(x, self.E.weight.transpose(1,0))
         x += self.b.expand_as(x)
