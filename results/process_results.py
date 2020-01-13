@@ -105,7 +105,7 @@ def write_results(results=None):
 
 def main():
     path_baseline = get_path('hntn_train_validate_and_test_wn18_200d_baseline.log', 'results')
-    path_hypothesis = get_path('hntn_train_validate_and_test_wn18_200d_hyper_plus.log', 'results')
+    path_hypothesis = get_path('hntn_train_validate_and_test_wn18_200d_hypothesis.log', 'results')
 
     logger.info('Parsing baseline results...')
     results_cost_baseline, \
