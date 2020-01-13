@@ -88,7 +88,7 @@ def write_results(results=None):
         for metric in results:
             metric_baseline, metric_hypothesis = results[metric]
 
-            with open(f'hntn_train_validate_and_test_wn18_200d_{metric}.csv', mode='w') as resultsfile:
+            with open(f'hntn_train_validate_and_test_fb15k_200d_{metric}.csv', mode='w') as resultsfile:
                 csv_writer = csv.writer(resultsfile)
                 csv_writer.writerow([f'{metric}_training_baseline',
                                      f'{metric}_validation_baseline',
@@ -104,8 +104,8 @@ def write_results(results=None):
 
 
 def main():
-    path_baseline = get_path('hntn_train_validate_and_test_wn18_200d_baseline.log', 'results')
-    path_hypothesis = get_path('hntn_train_validate_and_test_wn18_200d_hypothesis.log', 'results')
+    path_baseline = get_path('hntn_train_validate_and_test_fb15k_200d_baseline.log', 'results')
+    path_hypothesis = get_path('hntn_train_validate_and_test_fb15k_200d_hypothesis.log', 'results')
 
     logger.info('Parsing baseline results...')
     results_cost_baseline, \
