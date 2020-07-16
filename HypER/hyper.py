@@ -23,7 +23,7 @@ stream_handler.setLevel(logging.INFO)
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
-file_handler = logging.FileHandler('hntn_train_validate_and_test_fb15k_200d_hypothesis.log')
+file_handler = logging.FileHandler('hntn_train_validate_and_test_wn18rr_200d_hypothesis.log')
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
@@ -42,7 +42,7 @@ class Experiment:
                  cuda=False,
                  entity_input_dropout=0.,
                  relation_input_dropout=0.,
-                 hypernetwork_input_dropout=0.,
+                 relational_filter_dropout=0.,
                  feature_map_dropout=0.,
                  hidden_dropout=0.,
                  in_channels=1,
@@ -62,7 +62,7 @@ class Experiment:
         self.cuda = cuda
         self.kwargs = {"entity_input_dropout": entity_input_dropout,
                        "relation_input_dropout": relation_input_dropout,
-                       "hypernetwork_input_dropout": hypernetwork_input_dropout,
+                       "relational_filter_dropout": relational_filter_dropout,
                        "feature_map_dropout": feature_map_dropout,
                        "hidden_dropout": hidden_dropout,
                        "in_channels":in_channels,
@@ -320,7 +320,7 @@ if __name__ == '__main__':
                             cuda=True,
                             entity_input_dropout=0.2,
                             relation_input_dropout=0.2,
-                            hypernetwork_input_dropout=0.2,
+                            relational_filter_dropout=0.2,
                             feature_map_dropout=0.2,
                             hidden_dropout=0.3,
                             in_channels=1,

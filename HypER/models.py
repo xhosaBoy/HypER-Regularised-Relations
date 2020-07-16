@@ -94,7 +94,7 @@ class HypER(torch.nn.Module):
 
         self.entity_inp_drop = torch.nn.Dropout(kwargs["entity_input_dropout"])
         self.relation_inp_drop = torch.nn.Dropout(kwargs["relation_input_dropout"])
-        self.hypernetwork_input_drop = torch.nn.Dropout(kwargs["hypernetwork_input_dropout"])
+        self.relational_filter_drop = torch.nn.Dropout(kwargs["relational_filter_dropout"])
         self.feature_map_drop = torch.nn.Dropout2d(kwargs["feature_map_dropout"])
         self.hidden_drop = torch.nn.Dropout(kwargs["hidden_dropout"])
 
@@ -127,7 +127,7 @@ class HypER(torch.nn.Module):
 
         # relational filter normalisation
         k = self.bn2(k)
-        k = self.hypernetwork_input_drop(k)
+        k = self.relational_filter_drop(k)
 
         x = F.conv2d(x, k, groups=e1.size(0))
         x = F.relu(x)
