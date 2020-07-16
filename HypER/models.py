@@ -91,6 +91,7 @@ class HypER(torch.nn.Module):
         self.bn1 = torch.nn.BatchNorm1d(d2)
         self.bn2 = torch.nn.BatchNorm2d(self.in_channels)
         self.bn3 = torch.nn.BatchNorm2d(self.out_channels)
+        self.bn4 = torch.nn.BatchNorm1d(d1)
 
         self.entity_inp_drop = torch.nn.Dropout(kwargs["entity_input_dropout"])
         self.relation_inp_drop = torch.nn.Dropout(kwargs["relation_input_dropout"])
@@ -145,8 +146,10 @@ class HypER(torch.nn.Module):
         x = x.view(e1.size(0), -1)
 
         x = self.fc(x)
-        # x = F.relu(x)
+        x = F.relu(x)
 
+        # Hidden layer regularisation
+        x = self.bn4(x)
         x = self.hidden_drop(x)
 
         x = torch.mm(x, self.E.weight.transpose(1,0))
