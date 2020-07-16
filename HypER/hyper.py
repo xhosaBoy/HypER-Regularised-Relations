@@ -40,9 +40,11 @@ class Experiment:
                  batch_size=128,
                  decay_rate=0.,
                  cuda=False,
-                 input_dropout=0.,
-                 hidden_dropout=0.,
+                 entity_input_dropout=0.,
+                 relation_input_dropout=0.,
+                 hypernetwork_input_dropout=0.,
                  feature_map_dropout=0.,
+                 hidden_dropout=0.,
                  in_channels=1,
                  out_channels=32,
                  filt_h=3,
@@ -58,9 +60,11 @@ class Experiment:
         self.decay_rate = decay_rate
         self.label_smoothing = label_smoothing
         self.cuda = cuda
-        self.kwargs = {"input_dropout": input_dropout,
-                       "hidden_dropout": hidden_dropout,
+        self.kwargs = {"entity_input_dropout": entity_input_dropout,
+                       "relation_input_dropout": relation_input_dropout,
+                       "hypernetwork_input_dropout": hypernetwork_input_dropout,
                        "feature_map_dropout": feature_map_dropout,
+                       "hidden_dropout": hidden_dropout,
                        "in_channels":in_channels,
                        "out_channels": out_channels,
                        "filt_h": filt_h,
@@ -287,7 +291,7 @@ if __name__ == '__main__':
                         help='Which algorithm to use: HypER, ConvE, DistMult, or ComplEx')
     parser.add_argument('--dataset',
                         type=str,
-                        default="FB15k",
+                        default="WN18RR",
                         nargs="?",
                         help='Which dataset to use: FB15k, FB15k-237, WN18 or WN18RR')
 
@@ -314,9 +318,11 @@ if __name__ == '__main__':
                             ent_vec_dim=200,
                             rel_vec_dim=200,
                             cuda=True,
-                            input_dropout=0.2,
-                            hidden_dropout=0.3,
+                            entity_input_dropout=0.2,
+                            relation_input_dropout=0.2,
+                            hypernetwork_input_dropout=0.2,
                             feature_map_dropout=0.2,
+                            hidden_dropout=0.3,
                             in_channels=1,
                             out_channels=32,
                             filt_h=1,
