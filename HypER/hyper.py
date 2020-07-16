@@ -281,9 +281,9 @@ class Experiment:
                     logger.info(f'Starting Evaluation: Validation ...')
                     self.evaluate(model, d.valid_data, epoch, 'validation')
                     logger.info(f'Evaluation: Validation complete!')
-                    logger.info(f'Starting Evaluation: Test ...')
-                    self.evaluate(model, d.test_data, epoch, 'testing')
-                    logger.info(f'Evaluation: Test complete!')
+                    # logger.info(f'Starting Evaluation: Test ...')
+                    # self.evaluate(model, d.test_data, epoch, 'testing')
+                    # logger.info(f'Evaluation: Test complete!')
 
                     logger.info('Checkpointing model ...')
                     torch.save(model.state_dict(), 'HypER.mc')
