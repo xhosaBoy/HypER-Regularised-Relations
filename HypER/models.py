@@ -145,7 +145,7 @@ class HypER(torch.nn.Module):
         x = x.view(e1.size(0), -1)
 
         x = self.fc(x)
-        x = F.relu(x)
+        # x = F.relu(x)
 
         x = self.hidden_drop(x)
 
