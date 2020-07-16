@@ -49,24 +49,26 @@ def parse_results(path):
                 value = float(record[1].split(':')[1].strip())
                 logger.debug(f'value: {value}')
 
-                if metric == 'Mean evaluation cost':
-                    results_cost[record[0]].append(value)
-                    logger.debug(f'results_cost: {results_cost}')
-                elif metric == 'Hits @10':
-                    results_hits_at_10[record[0]].append(value)
-                    logger.debug(f'results_hits_at_10: {results_hits_at_10}')
-                elif metric == 'Hits @3':
-                    results_hits_at_3[record[0]].append(value)
-                    logger.debug(f'results_hits_at_3: {results_hits_at_3}')
-                elif metric == 'Hits @1':
-                    results_hits_at_1[record[0]].append(value)
-                    logger.debug(f'results_hits_at_1: {results_hits_at_1}')
-                elif metric == 'Mean rank':
-                    results_mean_rank[record[0]].append(value)
-                    logger.debug(f'results_mean_rank: {results_mean_rank}')
-                elif metric == 'Mean reciprocal rank':
-                    results_mean_reciprocal_rank[record[0]].append(value)
-                    logger.debug(f'results_mean_reciprocal_rank: {results_mean_reciprocal_rank}')
+                epoch = int(record[0].split(':')[1])
+                if epoch % 10 == 0:
+                    if metric == 'Mean evaluation cost':
+                        results_cost[record[0]].append(value)
+                        logger.debug(f'results_cost: {results_cost}')
+                    elif metric == 'Hits @10':
+                        results_hits_at_10[record[0]].append(value)
+                        logger.debug(f'results_hits_at_10: {results_hits_at_10}')
+                    elif metric == 'Hits @3':
+                        results_hits_at_3[record[0]].append(value)
+                        logger.debug(f'results_hits_at_3: {results_hits_at_3}')
+                    elif metric == 'Hits @1':
+                        results_hits_at_1[record[0]].append(value)
+                        logger.debug(f'results_hits_at_1: {results_hits_at_1}')
+                    elif metric == 'Mean rank':
+                        results_mean_rank[record[0]].append(value)
+                        logger.debug(f'results_mean_rank: {results_mean_rank}')
+                    elif metric == 'Mean reciprocal rank':
+                        results_mean_reciprocal_rank[record[0]].append(value)
+                        logger.debug(f'results_mean_reciprocal_rank: {results_mean_reciprocal_rank}')
 
     logger.info(f'results_cost: {results_cost}')
     logger.info(f'results_hits_at_10: {results_hits_at_10}')
@@ -83,29 +85,29 @@ def parse_results(path):
            results_mean_reciprocal_rank
 
 
-def write_results(results=None):
-    if results:
-        for metric in results:
-            metric_baseline, metric_hypothesis = results[metric]
+def write_results(results, data_set):
+    for metric in results:
+        metric_baseline, metric_hypothesis = results[metric]
 
-            with open(f'hntn_train_validate_and_test_fb15k_200d_{metric}.csv', mode='w') as resultsfile:
-                csv_writer = csv.writer(resultsfile)
-                csv_writer.writerow([f'{metric}_training_baseline',
-                                     f'{metric}_validation_baseline',
-                                     f'{metric}_test_baseline',
-                                     f'{metric}_training_hypothesis',
-                                     f'{metric}_validation_hypothesis',
-                                     f'{metric}_test_hypothesis'])
-                for epoch in metric_baseline:
-                    result = metric_baseline[epoch]
-                    result.extend(metric_hypothesis[epoch])
-                    logger.debug(f'result: {result}')
-                    csv_writer.writerow(result)
+        with open(f'hntn_train_validate_and_test_{data_set}_200d_{metric}.csv', mode='w') as resultsfile:
+            csv_writer = csv.writer(resultsfile)
+            csv_writer.writerow([f'{metric}_training_hypothesis',
+                                 f'{metric}_validation_hypothesis',
+                                 f'{metric}_test_hypothesis',
+                                 f'{metric}_training_baseline',
+                                 f'{metric}_validation_baseline',
+                                 f'{metric}_test_baseline'])
+
+            for epoch in metric_hypothesis:
+                result = metric_hypothesis[epoch]
+                result.extend(metric_baseline[epoch])
+                logger.debug(f'result: {result}')
+                csv_writer.writerow(result)
 
 
-def main():
-    path_baseline = get_path('hntn_train_validate_and_test_fb15k_200d_baseline.log', 'results')
-    path_hypothesis = get_path('hntn_train_validate_and_test_fb15k_200d_hypothesis.log', 'results')
+def main(data_set):
+    path_baseline = get_path(f'hntn_train_validate_and_test_{data_set}_200d_baseline.log', 'results')
+    path_hypothesis = get_path(f'hntn_train_validate_and_test_{data_set}_200d_hypothesis.log', 'results')
 
     logger.info('Parsing baseline results...')
     results_cost_baseline, \
@@ -133,11 +135,11 @@ def main():
                'mean_rank': (results_mean_rank_baseline, results_mean_rank_hypothesis),
                'mean_reciprocal_rank': (results_mean_reciprocal_rank_baseline, results_mean_reciprocal_rank_hypothesis)}
     logger.debug(f'results: {results}')
-    write_results(results)
+    write_results(results, data_set)
     logger.info('Writing results complete!')
 
 
 if __name__ == '__main__':
     logger.info('START!')
-    main()
+    main(data_set='fb15k_237')
     logger.info('DONE!')

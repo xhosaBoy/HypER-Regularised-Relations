@@ -28,7 +28,7 @@ file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-    
+
 class Experiment:
 
     def __init__(self,
@@ -61,11 +61,11 @@ class Experiment:
         self.kwargs = {"input_dropout": input_dropout,
                        "hidden_dropout": hidden_dropout,
                        "feature_map_dropout": feature_map_dropout,
-                       "in_channels":in_channels,
+                       "in_channels": in_channels,
                        "out_channels": out_channels,
                        "filt_h": filt_h,
                        "filt_w": filt_w}
-        
+
     def get_data_idxs(self, data):
         data_idxs = [(self.entity_idxs[data[i][0]],
                       self.relation_idxs[data[i][1]],
@@ -190,7 +190,7 @@ class Experiment:
         logger.info(f'Epoch: {epoch}, Mean reciprocal rank_{data_type.lower()}: {np.mean(1. / np.array(ranks))}')
 
     def train_and_eval(self):
-        logger.info(f'Training the {model_name} model ...')
+        logger.info(f'Training the {model_name} model with {dataset} knowledge graph ...')
         self.entity_idxs = {d.entities[i]: i for i in range(len(d.entities))}
         self.relation_idxs = {d.relations[i]: i for i in range(len(d.relations))}
         train_triple_idxs = self.get_data_idxs(d.train_data)
@@ -228,7 +228,7 @@ class Experiment:
         for epoch in range(1, self.epochs + 1):
             logger.info(f'Epoch: {epoch}')
 
-            model.train()    
+            model.train()
             costs = []
             np.random.shuffle(er_vocab_pairs)
 
@@ -261,7 +261,7 @@ class Experiment:
 
             logger.info(f'Mean training cost: {np.mean(costs)}')
 
-            if epoch % 2 == 0:
+            if epoch % 10 == 0:
                 model.eval()
                 with torch.no_grad():
                     train_data = np.array(d.train_data)
@@ -270,21 +270,37 @@ class Experiment:
                     train_data = train_data[np.random.choice(train_data.shape[0],
                                                              train_data_sample_size,
                                                              replace=False), :]
+
+                    logger.info(f'Starting Evaluation: Training ...')
                     self.evaluate(model, train_data, epoch, 'training')
-                    logger.info(f'Starting Validation ...')
+                    logger.info(f'Evaluation: Training complete!')
+                    logger.info(f'Starting Evaluation: Validation ...')
                     self.evaluate(model, d.valid_data, epoch, 'validation')
-                    logger.info(f'Starting Test ...')
+                    logger.info(f'Evaluation: Validation complete!')
+                    logger.info(f'Starting Evaluation: Test ...')
                     self.evaluate(model, d.test_data, epoch, 'testing')
+                    logger.info(f'Evaluation: Test complete!')
+
+                    logger.info('Checkpointing model ...')
+                    torch.save(model.state_dict(), 'HypER.mc')
+                    logger.info('Model checkpoint complete!')
+
+            logger.info('Saving final model ...')
+            torch.save(model.state_dict(), 'HypER.pt')
+            logger.info('Saving final model complete!')
 
 
 if __name__ == '__main__':
+
     logger.info('START!')
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--algorithm',
                         type=str,
                         default="HypER",
                         nargs="?",
                         help='Which algorithm to use: HypER, ConvE, DistMult, or ComplEx')
+
     parser.add_argument('--dataset',
                         type=str,
                         default="FB15k",
@@ -323,4 +339,5 @@ if __name__ == '__main__':
                             filt_w=9,
                             label_smoothing=0.1)
     experiment.train_and_eval()
+
     logger.info('DONE!')
