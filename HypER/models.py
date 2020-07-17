@@ -104,7 +104,7 @@ class HypER(torch.nn.Module):
     def init(self):
         xavier_normal_(self.E.weight.data)
         xavier_normal_(self.R.weight.data)
-        xavier_normal_(self.fc.weight.data)
+        # xavier_normal_(self.fc.weight.data)
 
     def forward(self, e1_idx, r_idx):
 
@@ -147,10 +147,10 @@ class HypER(torch.nn.Module):
         x = x.view(e1.size(0), -1)
 
         x = self.fc(x)
-        x = F.tanh(x)
+        # x = F.tanh(x)
 
         # Hidden layer regularisation
-        x = self.bn4(x)
+        # x = self.bn4(x)
         x = self.hidden_drop(x)
 
         x = torch.mm(x, self.E.weight.transpose(1,0))
