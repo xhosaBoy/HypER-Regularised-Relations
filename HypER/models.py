@@ -105,7 +105,6 @@ class HypER(torch.nn.Module):
         xavier_normal_(self.E.weight.data)
         xavier_normal_(self.R.weight.data)
         xavier_normal_(self.fc.weight.data)
-        xavier_normal_(self.fc1.weight.data)
 
     def forward(self, e1_idx, r_idx):
 
