@@ -102,9 +102,9 @@ class HypER(torch.nn.Module):
         self.loss = torch.nn.BCELoss()
 
     def init(self):
-        kaiming_normal_(self.E.weight.data)
-        kaiming_normal_(self.R.weight.data)
-        kaiming_normal_(self.fc.weight.data)
+        xavier_normal_(self.E.weight.data)
+        xavier_normal_(self.R.weight.data)
+        xavier_normal_(self.fc.weight.data)
 
     def forward(self, e1_idx, r_idx):
 
@@ -132,7 +132,7 @@ class HypER(torch.nn.Module):
         k = self.relational_filter_drop(k)
 
         x = F.conv2d(x, k, groups=e1.size(0))
-        x = F.relu(x)
+        x = F.tanh(x)
 
         # depthwise convolution
         x = x.view(e1.size(0), 1, self.out_channels, 1 - self.filt_h + 1, e1.size(3) - self.filt_w + 1)
@@ -147,7 +147,7 @@ class HypER(torch.nn.Module):
         x = x.view(e1.size(0), -1)
 
         x = self.fc(x)
-        x = F.relu(x)
+        x = F.tanh(x)
 
         # Hidden layer regularisation
         # x = self.bn4(x)
