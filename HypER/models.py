@@ -150,7 +150,7 @@ class HypER(torch.nn.Module):
         # x = F.relu(x)
 
         # Hidden layer regularisation
-        # x = self.bn4(x)
+        x = self.bn4(x)
         x = self.hidden_drop(x)
 
         x = torch.mm(x, self.E.weight.transpose(1,0))
