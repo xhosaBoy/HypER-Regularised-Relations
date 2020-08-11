@@ -86,6 +86,7 @@ class HypER(torch.nn.Module):
     def init(self):
         kaiming_normal_(self.E.weight.data)
         kaiming_normal_(self.R.weight.data)
+        kaiming_normal_(self.fc.weight.data)
 
     def forward(self, e1_idx, r_idx):
 
