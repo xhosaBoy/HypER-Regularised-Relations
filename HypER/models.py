@@ -1,6 +1,6 @@
 import torch
 from torch.nn import functional as F, Parameter
-from torch.nn.init import xavier_normal_, xavier_uniform_
+from torch.nn.init import xavier_normal_, xavier_uniform_, kaiming_normal_
 
 
 class ConvE(torch.nn.Module):
@@ -84,8 +84,8 @@ class HypER(torch.nn.Module):
         self.loss = torch.nn.BCELoss()
 
     def init(self):
-        xavier_normal_(self.E.weight.data)
-        xavier_normal_(self.R.weight.data)
+        kaiming_normal_(self.E.weight.data)
+        kaiming_normal_(self.R.weight.data)
 
     def forward(self, e1_idx, r_idx):
 
@@ -109,6 +109,7 @@ class HypER(torch.nn.Module):
         k = k.view(e1.size(0) * self.in_channels * self.out_channels, 1, self.filt_h, self.filt_w)
 
         x = F.conv2d(x, k, groups=e1.size(0))
+        x = F.relu(x)
 
         x = x.view(e1.size(0), 1, self.out_channels, 1 - self.filt_h + 1, e1.size(3) - self.filt_w + 1)
         x = x.permute(0, 3, 4, 1, 2)
